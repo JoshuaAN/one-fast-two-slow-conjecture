@@ -137,7 +137,7 @@ theorem P_preserves_K3 (f : ValueFn) (hf : InCone f) :
             - f (x, z.castSucc) - f (x, z.succ) := by
     intro z
     rcases Nat.eq_zero_or_pos x with rfl | hx
-    · -- x = 0:  f(0, z.succ) cancels itself; left with f(1, z.castSucc) - f(0, z.castSucc) ≥ 0
+    · -- x = 0
       have h := hf.K1 z.castSucc 0
       simp; linarith
     · have hsub1 : x - 1 + 1 = x     := Nat.sub_add_cancel hx
@@ -146,26 +146,26 @@ theorem P_preserves_K3 (f : ValueFn) (hf : InCone f) :
       rw [hsub1, hsub2] at h
       linarith
   fin_cases y
-  -- ── y.castSucc = 0, y.succ = 1 ──────────────────────────────────────
+  -- y = 0
   · simp [P]
-    -- λ term: K3 of f at x+1, row 0
+    -- λ term
     have h_lam : 0 ≤ f (x + 1 + 2, 0) + f (x + 1, 1)
                        - f (x + 1 + 1, 0) - f (x + 1 + 1, 1) := hf.K3 0 (x + 1)
-    -- μ₁ term: boundary M̂ at x, row 0
+    -- μ₁ term
     have h_bdry : 0 ≤ f (x + 1, 0) + f (x - 1, 1) - f (x, 0) - f (x, 1) := hatM 0
-    -- μ₂ terms: K2 at x (row 0) + K3 at x (row 0)
+    -- μ₂ terms
     have h_k2 : 0 ≤ f (x + 2, 0) - 2 * f (x + 1, 0) + f (x, 0)         := hf.K2 0 x
     have h_k3 : 0 ≤ f (x + 2, 0) + f (x, 1) - f (x + 1, 0) - f (x + 1, 1) := hf.K3 0 x
     nlinarith [mul_nonneg hΛ_nn h_lam, mul_nonneg hμ₁_nn h_bdry,
                mul_nonneg hμ₂_nn h_k2, mul_nonneg hμ₂_nn h_k3]
-  -- ── y.castSucc = 1, y.succ = 2 ──────────────────────────────────────
+  -- y = 1
   · simp [P]
-    -- λ term: K3 of f at x+1, row 1
+    -- λ term
     have h_lam : 0 ≤ f (x + 1 + 2, 1) + f (x + 1, 2)
                        - f (x + 1 + 1, 1) - f (x + 1 + 1, 2) := hf.K3 1 (x + 1)
-    -- μ₁ term: boundary M̂ at x, row 1
+    -- μ₁ term
     have h_bdry : 0 ≤ f (x + 1, 1) + f (x - 1, 2) - f (x, 1) - f (x, 2) := hatM 1
-    -- μ₂ terms: K2 at x (row 1) + K3 at x (row 0).  Note the row-0 K3!
+    -- μ₂ terms
     have h_k2 : 0 ≤ f (x + 2, 1) - 2 * f (x + 1, 1) + f (x, 1)         := hf.K2 1 x
     have h_k3 : 0 ≤ f (x + 2, 0) + f (x, 1) - f (x + 1, 0) - f (x + 1, 1) := hf.K3 0 x
     nlinarith [mul_nonneg hΛ_nn h_lam, mul_nonneg hμ₁_nn h_bdry,
@@ -180,14 +180,12 @@ theorem P_preserves_K4 (f : ValueFn) (hf : InCone f) :
   have hμ₁_nn : 0 ≤ p.μ₁ := (p.hμ₂_pos.trans p.hμ_ord).le
   have hμ₂_nn : 0 ≤ p.μ₂ := p.hμ₂_pos.le
   have hΛ_nn  : 0 ≤ p.Λ  := p.hΛ_nn
-  -- Boundary-extended Ŝ^f_y(x-1):
-  -- at x = 0 it's identically 0; at x ≥ 1 it's K4 of f at x - 1.
   have hatS : ∀ z : Fin 2,
       0 ≤ f (x - 1, z.castSucc) + f (x, z.succ)
             - f (x, z.castSucc) - f (x - 1, z.succ) := by
     intro z
     rcases Nat.eq_zero_or_pos x with rfl | hx
-    · -- x = 0: 0 - 1 = 0, so the expression is identically zero.
+    · -- x = 0
       simp
     · have hsub : x - 1 + 1 = x := Nat.sub_add_cancel hx
       have h := hf.K4 z (x - 1)
@@ -196,7 +194,7 @@ theorem P_preserves_K4 (f : ValueFn) (hf : InCone f) :
   -- Normalize (x+1) - 1 ↦ x in the goal (K4 doesn't touch (x+2) - 1).
   have e1 : (x + 1 : ℕ) - 1 = x := by omega
   fin_cases y
-  -- ── y.castSucc = 0, y.succ = 1 ──────────────────────────────────────
+  -- y = 0
   · show P p f (x, 0) + P p f (x + 1, 1)
           - P p f (x + 1, 0) - P p f (x, 1) ≥ 0
     simp only [P]
@@ -210,17 +208,17 @@ theorem P_preserves_K4 (f : ValueFn) (hf : InCone f) :
     have h_slow : 0 ≤ f (x, 0) + f (x + 1, 1) - f (x + 1, 0) - f (x, 1) := hf.K4 0 x
     nlinarith [mul_nonneg hΛ_nn h_lam, mul_nonneg hμ₁_nn h_bdry,
                mul_nonneg hμ₂_nn h_slow]
-  -- ── y.castSucc = 1, y.succ = 2 ──────────────────────────────────────
+  -- y = 1
   · show P p f (x, 1) + P p f (x + 1, 2)
           - P p f (x + 1, 1) - P p f (x, 2) ≥ 0
     simp only [P]
     rw [e1]
-    -- λ-term: K4 at x+1, row 1
+    -- λ-term
     have h_lam  : 0 ≤ f (x + 1, 1) + f (x + 1 + 1, 2)
                        - f (x + 1 + 1, 1) - f (x + 1, 2) := hf.K4 1 (x + 1)
-    -- μ₁-term: boundary Ŝ at x, row 1
+    -- μ₁-term
     have h_bdry : 0 ≤ f (x - 1, 1) + f (x, 2) - f (x, 1) - f (x - 1, 2) := hatS 1
-    -- μ₂-term: K4 at x, row 0 (note: row 0, NOT row 1)
+    -- μ₂-term
     have h_slow : 0 ≤ f (x, 0) + f (x + 1, 1) - f (x + 1, 0) - f (x, 1) := hf.K4 0 x
     nlinarith [mul_nonneg hΛ_nn h_lam, mul_nonneg hμ₁_nn h_bdry,
                mul_nonneg hμ₂_nn h_slow]
@@ -232,25 +230,25 @@ theorem P_preserves_K5 (f : ValueFn) (hf : InCone f) :
   have hμ₂_nn : 0 ≤ p.μ₂ := p.hμ₂_pos.le
   have hΛ_nn  : 0 ≤ p.Λ  := p.hΛ_nn
   fin_cases y
-  -- ── y.castSucc = 0, y.succ = 1 ──────────────────────────────────────
+  -- y = 0
   · show P p f (x, 1) - P p f (x, 0) ≥ 0
     simp only [P]
-    -- λ-term: K5 at x+1, row 0
+    -- λ-term
     have h_lam  : 0 ≤ f (x + 1, 1) - f (x + 1, 0) := hf.K5 0 (x + 1)
-    -- μ₁-term: K5 at x-1, row 0 (no boundary issue — K5 holds at every ℕ)
+    -- μ₁-term
     have h_bdry : 0 ≤ f (x - 1, 1) - f (x - 1, 0) := hf.K5 0 (x - 1)
-    -- μ₂-term: K5 at x, row 0
+    -- μ₂-term
     have h_slow : 0 ≤ f (x, 1)     - f (x, 0)     := hf.K5 0 x
     nlinarith [mul_nonneg hΛ_nn h_lam, mul_nonneg hμ₁_nn h_bdry,
                mul_nonneg hμ₂_nn h_slow]
-  -- ── y.castSucc = 1, y.succ = 2 ──────────────────────────────────────
+  -- y = 1
   · show P p f (x, 2) - P p f (x, 1) ≥ 0
     simp only [P]
-    -- λ-term: K5 at x+1, row 1
+    -- λ-term
     have h_lam  : 0 ≤ f (x + 1, 2) - f (x + 1, 1) := hf.K5 1 (x + 1)
-    -- μ₁-term: K5 at x-1, row 1
+    -- μ₁-term
     have h_bdry : 0 ≤ f (x - 1, 2) - f (x - 1, 1) := hf.K5 1 (x - 1)
-    -- μ₂-term: K5 at x, row 0 (cross-row!)
+    -- μ₂-term
     have h_slow : 0 ≤ f (x, 1)     - f (x, 0)     := hf.K5 0 x
     nlinarith [mul_nonneg hΛ_nn h_lam, mul_nonneg hμ₁_nn h_bdry,
                mul_nonneg hμ₂_nn h_slow]
@@ -276,32 +274,28 @@ theorem P_preserves_K7 (f : ValueFn) (hf : InCone f) :
     have hμ₂_nn : 0 ≤ p.μ₂ := p.hμ₂_pos.le
     have hΛ_nn  : 0 ≤ p.Λ  := p.hΛ_nn
     have h2μ₂_nn : (0 : ℝ) ≤ 2 * p.μ₂ := by linarith
-    -- Boundary-extended R̂^f at x-1:
-    -- at x = 0 it's K1 at 0 (row 0) + K6 at 0;
-    -- at x ≥ 1 it's K7 of f at x - 1.
     have hatR : 0 ≤ f (x + 1, 0) + f (x - 1, 2) - 2 * f (x, 1) := by
       rcases Nat.eq_zero_or_pos x with rfl | hx
-      · -- x = 0: combine K1 of f at 0 (row 0) and K6 of f at 0
-        have hK1 := hf.K1 0 0     -- 0 ≤ f(1, 0) - f(0, 0)
-        have hK6 := hf.K6 0       -- 0 ≤ f(0, 0) + f(0, 2) - 2 f(0, 1)
+      · -- x = 0
+        have hK1 := hf.K1 0 0
+        have hK6 := hf.K6 0
         simp at hK1 ⊢
         linarith
-      · -- x ≥ 1: K7 of f at x - 1
+      · -- x ≥ 1
         have hsub1 : x - 1 + 1 = x     := Nat.sub_add_cancel hx
         have hsub2 : x - 1 + 2 = x + 1 := by omega
         have h := hf.K7 (x - 1)
         rw [hsub1, hsub2] at h
         linarith
-    -- Normalize (x+2)-1 ↦ x+1, (x+1)-1 ↦ x in the goal.
     have e1 : (x + 2 : ℕ) - 1 = x + 1 := by omega
     have e2 : (x + 1 : ℕ) - 1 = x     := by omega
     simp only [P]
     rw [e1, e2]
-    -- λ-term: K7 of f at x+1
+    -- λ-term
     have h_lam  : 0 ≤ f (x + 1 + 2, 0) + f (x + 1, 2) - 2 * f (x + 1 + 1, 1) := hf.K7 (x + 1)
-    -- μ₁-term: boundary R̂ at x
+    -- μ₁-term
     have h_bdry : 0 ≤ f (x + 1, 0) + f (x - 1, 2) - 2 * f (x, 1) := hatR
-    -- 2μ₂-term: K3 of f at x, row 0
+    -- 2μ₂-term
     have h_slow : 0 ≤ f (x + 2, 0) + f (x, 1) - f (x + 1, 0) - f (x + 1, 1) := hf.K3 0 x
     nlinarith [mul_nonneg hΛ_nn h_lam, mul_nonneg hμ₁_nn h_bdry,
               mul_nonneg h2μ₂_nn h_slow]
