@@ -54,6 +54,18 @@ def P (f : ValueFn) : ValueFn := fun (x, y) =>
   | 1 => p.Λ * f (x+1, 1) + p.μ₁ * f (x-1, 1) + p.μ₂ * f (x, 0) + p.μ₂ * f (x, 1)
   | 2 => p.Λ * f (x+1, 2) + p.μ₁ * f (x-1, 2) + 2 * p.μ₂ * f (x, 1)
 
+/-- The true nonpremptive assignment operator, equation (1.16). -/
+def Q_true (f : ValueFn) : ValueFn := fun (x, y) =>
+  match y, x with
+  | 0, 0       => f (0, 0)
+  | 0, 1       => f (1, 0)
+  | 0, 2       => min (f (2, 0)) (f (1, 1))
+  | 0, x + 3   => min (f (x + 3, 0)) (min (f (x + 2, 1)) (f (x + 1, 2)))
+  | 1, 0       => f (0, 1)
+  | 1, 1       => f (1, 1)
+  | 1, x + 2   => min (f (x + 2, 1)) (f (x + 1, 2))
+  | 2, _       => f (x, 2)
+
 /-- The relaxed tail-minimum assignment operator, equation (1.19).
 
 Note this is explicitly defined through casing to make the closure proof easier. Maybe
