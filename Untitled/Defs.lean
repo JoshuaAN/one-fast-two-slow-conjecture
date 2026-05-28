@@ -72,6 +72,10 @@ def Q (f : ValueFn) : ValueFn := fun (x, y) =>
     total number of customers in the system. -/
 def c : ValueFn := fun (x, y) => (x : ℝ) + (y : ℝ)
 
+/-- One step of the relaxed value iteration, `Vₘ₊₁ = c + ρ·P(Q Vₘ)`, equation (1.12). -/
+def valueStep (ρ : ℝ) (V : ValueFn) : ValueFn :=
+  fun s => c s + ρ * P p (Q V) s
+
 /-- The invariant cone `𝒦` from §2 of the paper. -/
 structure InCone (f : ValueFn) : Prop where
   K1 : ∀ (y : Fin 3) (x : ℕ), f (x + 1, y) - f (x, y) ≥ 0
@@ -83,3 +87,10 @@ structure InCone (f : ValueFn) : Prop where
   K5 : ∀ (y : Fin 2) (x : ℕ), f (x, y.succ) - f (x, y.castSucc) ≥ 0
   K6 : ∀ x : ℕ, f (x, 0) + f (x, 2) - 2 * f (x, 1) ≥ 0
   K7 : ∀ x : ℕ, f (x + 2, 0) + f (x, 2) - 2 * f (x + 1, 1) ≥ 0
+
+/-- The boundary comparisons, equations (5.1)-(5.2). -/
+structure BoundaryComp (f : ValueFn) : Prop where
+  /-- `f(1,0) ≤ f(0,1)` (eq 5.1). -/
+  b1 : f (1, 0) ≤ f (0, 1)
+  /-- `f(1,1) ≤ f(0,2)` (eq 5.2). -/
+  b2 : f (1, 1) ≤ f (0, 2)
