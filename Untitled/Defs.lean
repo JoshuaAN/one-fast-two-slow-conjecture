@@ -91,14 +91,13 @@ def valueStep (ρ : ℝ) (V : ValueFn) : ValueFn :=
 /-- The invariant cone `𝒦` from §2 of the paper. -/
 structure InCone (f : ValueFn) : Prop where
   K1 : ∀ (y : Fin 3) (x : ℕ), f (x + 1, y) - f (x, y) ≥ 0
-  K2 : ∀ (y : Fin 3) (x : ℕ), f (x + 2, y) - 2 * f (x + 1, y) + f (x, y) ≥ 0
-  K3 : ∀ (y : Fin 2) (x : ℕ),
+  K2 : ∀ (y : Fin 2) (x : ℕ),
     f (x + 2, y.castSucc) + f (x, y.succ) - f (x + 1, y.castSucc) - f (x + 1, y.succ) ≥ 0
-  K4 : ∀ (y : Fin 2) (x : ℕ),
+  K3 : ∀ (y : Fin 2) (x : ℕ),
     f (x, y.castSucc) + f (x + 1, y.succ) - f (x + 1, y.castSucc) - f (x, y.succ) ≥ 0
-  K5 : ∀ (y : Fin 2) (x : ℕ), f (x, y.succ) - f (x, y.castSucc) ≥ 0
-  K6 : ∀ x : ℕ, f (x, 0) + f (x, 2) - 2 * f (x, 1) ≥ 0
-  K7 : ∀ x : ℕ, f (x + 2, 0) + f (x, 2) - 2 * f (x + 1, 1) ≥ 0
+  K4 : ∀ (y : Fin 2) (x : ℕ), f (x, y.succ) - f (x, y.castSucc) ≥ 0
+  K5 : ∀ x : ℕ, f (x, 0) + f (x, 2) - 2 * f (x, 1) ≥ 0
+  K6 : ∀ x : ℕ, f (x + 2, 0) + f (x, 2) - 2 * f (x + 1, 1) ≥ 0
 
 /-- The boundary comparisons, equations (5.1)-(5.2). -/
 structure BoundaryComp (f : ValueFn) : Prop where
