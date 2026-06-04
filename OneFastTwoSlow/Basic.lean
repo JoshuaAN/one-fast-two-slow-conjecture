@@ -1,7 +1,7 @@
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic
 
-import Untitled.Defs
+import OneFastTwoSlow.Defs
 
 /-!
 # Basic properties of the cone

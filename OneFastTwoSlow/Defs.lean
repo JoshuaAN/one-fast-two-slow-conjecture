@@ -71,7 +71,7 @@ def Q_true (f : ValueFn) : ValueFn := fun (x, y) =>
 Note this is explicitly defined through casing to make the closure proof easier. Maybe
 this should be proven to be equivalent to the min definition in the paper? Or maybe this
 is obvious enough where it doesn't matter? -/
-def Q (f : ValueFn) : ValueFn := fun (x, y) =>
+def Q_modified (f : ValueFn) : ValueFn := fun (x, y) =>
   match y, x with
   | 0, 0       => f (0, 0)
   | 0, 1       => min (f (1, 0)) (f (0, 1))
@@ -84,9 +84,13 @@ def Q (f : ValueFn) : ValueFn := fun (x, y) =>
     total number of customers in the system. -/
 def c : ValueFn := fun (x, y) => (x : ℝ) + (y : ℝ)
 
-/-- One step of the relaxed value iteration, `Vₘ₊₁ = c + ρ·P(Q Vₘ)`, equation (1.12). -/
-def valueStep (ρ : ℝ) (V : ValueFn) : ValueFn :=
-  fun s => c s + ρ * P p (Q V) s
+/-- One step of the bellman operator, `Vₘ₊₁ = c + ρ·P(Q Vₘ)`, equation (1.12). -/
+def T (ρ : ℝ) (V : ValueFn) : ValueFn :=
+  fun s => c s + ρ * P p (Q_true V) s
+
+/-- One step of the modified bellman operator -/
+def T_modified (ρ : ℝ) (V : ValueFn) : ValueFn :=
+  fun s => c s + ρ * P p (Q_modified V) s
 
 /-- The invariant cone `𝒦` from §2 of the paper. -/
 structure InCone (f : ValueFn) : Prop where

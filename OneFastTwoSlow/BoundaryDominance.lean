@@ -1,8 +1,8 @@
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic
 
-import Untitled.Defs
-import Untitled.AssignmentClosure
+import OneFastTwoSlow.Defs
+import OneFastTwoSlow.AssignmentClosure
 
 /-!
 # Boundary feasibility of the relaxed assignment operator (Lemma 4)
@@ -16,24 +16,26 @@ preserves the two boundary comparisons
 
 variable (p : QueueParams)
 
+private abbrev Q : ValueFn → ValueFn := Q_modified
+
 /-- Tail-order: `Q f (2,0) ≤ Q f (1,1)`, equation (5.3). -/
-lemma tail_20_le_11 (f : ValueFn) : Q f (2, 0) ≤ Q f (1, 1) := by
-  simp only [Q]; exact min_le_right _ _
+lemma tail_20_le_11 (f : ValueFn) : Q_modified f (2, 0) ≤ Q_modified f (1, 1) := by
+  simp only [Q_modified]; exact min_le_right _ _
 
 /-- Tail-order: `Q f (1,0) ≤ Q f (0,1)`, equation (5.3). -/
 lemma tail_10_le_01 (f : ValueFn) : Q f (1, 0) ≤ Q f (0, 1) := by
-  simp only [Q]; exact min_le_right _ _
+  simp only [Q_modified]; exact min_le_right _ _
 
 /-- Tail-order: `Q f (1,1) ≤ Q f (0,2)`, equation (5.3). -/
 lemma tail_11_le_02 (f : ValueFn) : Q f (1, 1) ≤ Q f (0, 2) := by
-  simp only [Q]; exact min_le_right _ _
+  simp only [Q_modified]; exact min_le_right _ _
 
 /-- Tail-order: `Q f (2,1) ≤ Q f (1,2)`, needed for equation (5.5). -/
 lemma tail_21_le_12 (f : ValueFn) : Q f (2, 1) ≤ Q f (1, 2) := by
-  simp only [Q]; exact min_le_right _ _
+  simp only [Q_modified]; exact min_le_right _ _
 
 private theorem step_b1 (ρ : ℝ) (hρ : 0 < ρ) (f : ValueFn) (hf : InCone f) :
-    valueStep p ρ f (1, 0) ≤ valueStep p ρ f (0, 1) := by
+    T_modified p ρ f (1, 0) ≤ T_modified p ρ f (0, 1) := by
   have hμ₂_nn : 0 ≤ p.μ₂ := p.hμ₂_pos.le
   have hΛ_nn  : 0 ≤ p.Λ  := p.hΛ_nn
   have hμsum  : 0 ≤ p.μ₁ + p.μ₂ := by linarith [p.hμ₂_pos, p.hμ_ord]
@@ -43,11 +45,11 @@ private theorem step_b1 (ρ : ℝ) (hρ : 0 < ρ) (f : ValueFn) (hf : InCone f) 
   have hWmono : Q f (0, 0) ≤ Q f (1, 0) := by have := hW.K1 0 0; linarith
   -- The difference equals ρ · D, with D a nonnegative combination (paper eq 5.4).
   have key :
-      valueStep p ρ f (0, 1) - valueStep p ρ f (1, 0)
+      T_modified p ρ f (0, 1) - T_modified p ρ f (1, 0)
         = ρ * ( p.Λ * (Q f (1, 1) - Q f (2, 0))
               + (p.μ₁ - p.μ₂) * (Q f (1, 0) - Q f (0, 0))
               + (p.μ₁ + p.μ₂) * (Q f (0, 1) - Q f (1, 0)) ) := by
-    simp only [valueStep, c, P, Fin.isValue]   -- unfold first → exposes (1-1), (0-1)
+    simp only [T_modified, c, P, Fin.isValue]   -- unfold first → exposes (1-1), (0-1)
     norm_num                                    -- reduce nat-sub and Fin casts
     ring
   -- D ≥ 0, using the tail-order lemmas and the x-monotonicity of Q f.
@@ -62,12 +64,12 @@ private theorem step_b1 (ρ : ℝ) (hρ : 0 < ρ) (f : ValueFn) (hf : InCone f) 
       mul_nonneg hμsum (by linarith [tail_10_le_01 f])
     linarith
   -- ρ · D ≥ 0, hence the difference ≥ 0.
-  have : 0 ≤ valueStep p ρ f (0, 1) - valueStep p ρ f (1, 0) := by
+  have : 0 ≤ T_modified p ρ f (0, 1) - T_modified p ρ f (1, 0) := by
     rw [key]; exact mul_nonneg hρ.le hD
   linarith
 
 private theorem step_b2 (ρ : ℝ) (hρ : 0 < ρ) (f : ValueFn) (hf : InCone f) :
-    valueStep p ρ f (1, 1) ≤ valueStep p ρ f (0, 2) := by
+    T_modified p ρ f (1, 1) ≤ T_modified p ρ f (0, 2) := by
   have hμ₁_nn : 0 ≤ p.μ₁ := (p.hμ₂_pos.trans p.hμ_ord).le
   have hμ₂_nn : 0 ≤ p.μ₂ := p.hμ₂_pos.le
   have hΛ_nn  : 0 ≤ p.Λ  := p.hΛ_nn
@@ -77,12 +79,12 @@ private theorem step_b2 (ρ : ℝ) (hρ : 0 < ρ) (f : ValueFn) (hf : InCone f) 
   have hWmono : Q f (0, 1) ≤ Q f (1, 1) := by have := hW.K1 1 0; linarith
   -- The difference equals ρ · D, with D a nonnegative combination (paper eq 5.5).
   have key :
-      valueStep p ρ f (0, 2) - valueStep p ρ f (1, 1)
+      T_modified p ρ f (0, 2) - T_modified p ρ f (1, 1)
         = ρ * ( p.Λ * (Q f (1, 2) - Q f (2, 1))
               + (p.μ₁ - p.μ₂) * (Q f (1, 1) - Q f (0, 1))
               + p.μ₁ * (Q f (0, 2) - Q f (1, 1))
               + p.μ₂ * (Q f (0, 1) - Q f (1, 0)) ) := by
-    simp only [valueStep, c, P, Fin.isValue]
+    simp only [T_modified, c, P, Fin.isValue]
     norm_num
     ring
   -- D ≥ 0, using the tail-order lemmas and the x-monotonicity of Q f.
@@ -100,11 +102,11 @@ private theorem step_b2 (ρ : ℝ) (hρ : 0 < ρ) (f : ValueFn) (hf : InCone f) 
       mul_nonneg hμ₂_nn (by linarith [tail_10_le_01 f])
     linarith
   -- ρ · D ≥ 0, hence the difference ≥ 0.
-  have : 0 ≤ valueStep p ρ f (0, 2) - valueStep p ρ f (1, 1) := by
+  have : 0 ≤ T_modified p ρ f (0, 2) - T_modified p ρ f (1, 1) := by
     rw [key]; exact mul_nonneg hρ.le hD
   linarith
 
 theorem boundary_dominance (ρ : ℝ) (hρ : 0 < ρ) (V : ValueFn) (hV : InCone V) :
-    BoundaryComp (valueStep p ρ V) where
+    BoundaryComp (T_modified p ρ V) where
   b1 := step_b1 p ρ hρ V hV
   b2 := step_b2 p ρ hρ V hV

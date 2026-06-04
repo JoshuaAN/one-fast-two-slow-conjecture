@@ -1,8 +1,10 @@
-import Untitled.Defs
-import Untitled.Basic
-import Untitled.AssignmentClosure
-import Untitled.EventClosure
-import Untitled.BoundaryDominance
-import Untitled.RelaxedEqualsTrue
+import OneFastTwoSlow.Defs
+import OneFastTwoSlow.Basic
+import OneFastTwoSlow.AssignmentClosure
+import OneFastTwoSlow.EventClosure
+import OneFastTwoSlow.BoundaryDominance
+import OneFastTwoSlow.RelaxedEqualsTrue
+import OneFastTwoSlow.BellmanConsistency
+
 
 def main : IO Unit := IO.println "ok"

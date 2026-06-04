@@ -2,18 +2,20 @@ import Mathlib.Data.Real.Basic
 import Mathlib.Data.Fin.Basic
 import Mathlib.Tactic
 
-import Untitled.Defs
-import Untitled.Basic
+import OneFastTwoSlow.Defs
+import OneFastTwoSlow.Basic
 
 /-!
 # Closure of the cone 𝒦 under the relaxed assignment operator (Lemma 2)
 -/
 
+private abbrev Q : ValueFn → ValueFn := Q_modified
+
 -- Row 0, position ≥ 2: three-way min.
 private lemma Q0_eq (f : ValueFn) (k : ℕ) :
     Q f (k + 2, 0) = f (k + 2, 0) ∨ Q f (k + 2, 0) = f (k + 1, 1)
       ∨ Q f (k + 2, 0) = f (k, 2) := by
-  simp only [Q]
+  simp only [Q_modified]
   rcases min_cases (f (k + 1, 1)) (f (k, 2)) with ⟨e, _⟩ | ⟨e, _⟩ <;>
   rcases min_cases (f (k + 2, 0)) (min (f (k + 1, 1)) (f (k, 2))) with ⟨E, _⟩ | ⟨E, _⟩
   · left; exact E
@@ -167,7 +169,7 @@ private theorem Q_preserves_K2 (f : ValueFn) (hf : InCone f) :
       -- "+" points get exact values; "−" points get upper bounds.
       have hP1 := Q0_eq f 0                      -- Q f (2,0)
       have hP1' := Q0_le f 0
-      have hP2 : Q f (0, 1) = f (0, 1) := by simp only [Q]
+      have hP2 : Q f (0, 1) = f (0, 1) := by simp only [Q_modified]
       have hM1 := Q0_pos1_le f                   -- Q f (1,0) ≤ branches
       have hM2 := Q1_le f 0                       -- Q f (1,1) ≤ branches
       rcases hP1 with e | e | e <;> rw [e, hP2] <;>
@@ -197,9 +199,9 @@ private theorem Q_preserves_K2 (f : ValueFn) (hf : InCone f) :
     -- Row 2 is exact everywhere; row 1 is the two-way min everywhere.
     have hP1 := Q1_eq f (x + 1)                   -- Q f (x+2,1)
     have hP1' := Q1_le f (x + 1)
-    have hP2 : Q f (x, 2) = f (x, 2) := by simp only [Q]
+    have hP2 : Q f (x, 2) = f (x, 2) := by simp only [Q_modified]
     have hM1 := Q1_le f x                          -- Q f (x+1,1) ≤ branches
-    have hM2 : Q f (x + 1, 2) = f (x + 1, 2) := by simp only [Q]
+    have hM2 : Q f (x + 1, 2) = f (x + 1, 2) := by simp only [Q_modified]
     rcases hP1 with e | e <;> rw [e, hP2, hM2] <;>
     linarith [K1 1 x, K1 2 x, K2_1 x, K2_1 (x+1), K3_1 x, K3_1 (x+1),
               K4_12 x, K4_12 (x+1), K5 x, K5 (x+1), K6 x,
@@ -260,11 +262,11 @@ private theorem Q_preserves_K3 (f : ValueFn) (hf : InCone f) :
   · match x with
     | 0 =>
       show Q f (0, 0) + Q f (1, 1) - Q f (1, 0) - Q f (0, 1) ≥ 0
-      have hP0 : Q f (0, 0) = f (0, 0) := by simp only [Q]   -- "+", exact
+      have hP0 : Q f (0, 0) = f (0, 0) := by simp only [Q_modified]   -- "+", exact
       have hP1 := Q1_eq f 0                                   -- "+", Q f (1,1)
       have hP1' := Q1_le f 0
       have hM1 := Q0_pos1_le f                                -- "−", Q f (1,0)
-      have hM2 : Q f (0, 1) = f (0, 1) := by simp only [Q]    -- "−", exact
+      have hM2 : Q f (0, 1) = f (0, 1) := by simp only [Q_modified]    -- "−", exact
       rcases hP1 with e | e <;> rw [hP0, e, hM2] <;>
       linarith [K1 0 0, K1 1 0, K2_0 0, K3_0 0, K3_1 0,
                 K4_01 0, K4_12 0, K5 0, K6 0,
@@ -308,10 +310,10 @@ private theorem Q_preserves_K3 (f : ValueFn) (hf : InCone f) :
   · match x with
     | 0 =>
       show Q f (0, 1) + Q f (1, 2) - Q f (1, 1) - Q f (0, 2) ≥ 0
-      have hP1 : Q f (0, 1) = f (0, 1) := by simp only [Q]    -- "+", exact
-      have hP2 : Q f (1, 2) = f (1, 2) := by simp only [Q]    -- "+", exact
+      have hP1 : Q f (0, 1) = f (0, 1) := by simp only [Q_modified]    -- "+", exact
+      have hP2 : Q f (1, 2) = f (1, 2) := by simp only [Q_modified]    -- "+", exact
       have hM1 := Q1_le f 0                                   -- "−", Q f (1,1)
-      have hM2 : Q f (0, 2) = f (0, 2) := by simp only [Q]    -- "−", exact
+      have hM2 : Q f (0, 2) = f (0, 2) := by simp only [Q_modified]    -- "−", exact
       rw [hP1, hP2, hM2]
       linarith [K1 1 0, K2 2 0, K2_1 0, K3_1 0, K4_12 0, K5 0, K6 0,
                 hM1.1, hM1.2]
@@ -319,9 +321,9 @@ private theorem Q_preserves_K3 (f : ValueFn) (hf : InCone f) :
       show Q f (k + 1, 1) + Q f (k + 2, 2) - Q f (k + 2, 1) - Q f (k + 1, 2) ≥ 0
       have hP1 := Q1_eq f k                                   -- "+", Q f (k+1,1)
       have hP1' := Q1_le f k
-      have hP2 : Q f (k + 2, 2) = f (k + 2, 2) := by simp only [Q]  -- "+", exact
+      have hP2 : Q f (k + 2, 2) = f (k + 2, 2) := by simp only [Q_modified]  -- "+", exact
       have hM1 := Q1_le f (k + 1)                             -- "−", Q f (k+2,1)
-      have hM2 : Q f (k + 1, 2) = f (k + 1, 2) := by simp only [Q]  -- "−", exact
+      have hM2 : Q f (k + 1, 2) = f (k + 1, 2) := by simp only [Q_modified]  -- "−", exact
       rcases hP1 with e | e <;> rw [e, hP2, hM2] <;>
       linarith [K1 1 k, K1 1 (k+1), K1 2 k, K1 2 (k+1),
                 K2 1 k, K2 2 k, K2_1 k, K2_1 (k+1), K3_1 k, K3_1 (k+1),
@@ -350,8 +352,8 @@ private theorem Q_preserves_K4 (f : ValueFn) (hf : InCone f) :
   · match x with
     | 0 =>
       show Q f (0, 1) - Q f (0, 0) ≥ 0
-      have h1 : Q f (0, 1) = f (0, 1) := by simp only [Q]
-      have h0 : Q f (0, 0) = f (0, 0) := by simp only [Q]
+      have h1 : Q f (0, 1) = f (0, 1) := by simp only [Q_modified]
+      have h0 : Q f (0, 0) = f (0, 0) := by simp only [Q_modified]
       rw [h1, h0]; linarith [K4_01 0]
     | 1 =>
       show Q f (1, 1) - Q f (1, 0) ≥ 0
@@ -370,13 +372,13 @@ private theorem Q_preserves_K4 (f : ValueFn) (hf : InCone f) :
   · match x with
     | 0 =>
       show Q f (0, 2) - Q f (0, 1) ≥ 0
-      have h2 : Q f (0, 2) = f (0, 2) := by simp only [Q]
-      have h1 : Q f (0, 1) = f (0, 1) := by simp only [Q]
+      have h2 : Q f (0, 2) = f (0, 2) := by simp only [Q_modified]
+      have h1 : Q f (0, 1) = f (0, 1) := by simp only [Q_modified]
       rw [h2, h1]; linarith [K4_12 0]
     | k + 1 =>
       show Q f (k + 1, 2) - Q f (k + 1, 1) ≥ 0
       -- Q f (k+1,2) = f(k+1,2) (exact);  Q f (k+1,1) bounded above
-      have h2 : Q f (k + 1, 2) = f (k + 1, 2) := by simp only [Q]
+      have h2 : Q f (k + 1, 2) = f (k + 1, 2) := by simp only [Q_modified]
       have hM := Q1_le f k          -- upper bounds on Q f (k+1,1)
       rw [h2]
       linarith [K1 2 k, K4_12 (k + 1), hM.1, hM.2]
@@ -419,15 +421,15 @@ private theorem Q_preserves_K5 (f : ValueFn) (hf : InCone f) :
   | 0 =>
     -- All three points exact: Q f(0,0)=f(0,0), Q f(0,1)=f(0,1), Q f(0,2)=f(0,2).
     show Q f (0, 0) + Q f (0, 2) - 2 * Q f (0, 1) ≥ 0
-    have h0 : Q f (0, 0) = f (0, 0) := by simp only [Q]
-    have h1 : Q f (0, 1) = f (0, 1) := by simp only [Q]
-    have h2 : Q f (0, 2) = f (0, 2) := by simp only [Q]
+    have h0 : Q f (0, 0) = f (0, 0) := by simp only [Q_modified]
+    have h1 : Q f (0, 1) = f (0, 1) := by simp only [Q_modified]
+    have h2 : Q f (0, 2) = f (0, 2) := by simp only [Q_modified]
     rw [h0, h1, h2]; linarith [K5 0]
   | 1 =>
     show Q f (1, 0) + Q f (1, 2) - 2 * Q f (1, 1) ≥ 0
     have hP0 := Q0_pos1_eq f          -- "+", Q f (1,0)
     have hP0' := Q0_pos1_le f
-    have hP2 : Q f (1, 2) = f (1, 2) := by simp only [Q]   -- "+", exact
+    have hP2 : Q f (1, 2) = f (1, 2) := by simp only [Q_modified]   -- "+", exact
     have hM := Q1_le f 0              -- "−", Q f (1,1): both upper bounds
     rcases hP0 with e | e <;> rw [e, hP2] <;>
     linarith [K1 1 0, K3_1 0, K4_01 0, K4_01 1, K4_12 0, K5 0, K5 1,
@@ -436,7 +438,7 @@ private theorem Q_preserves_K5 (f : ValueFn) (hf : InCone f) :
     show Q f (k + 2, 0) + Q f (k + 2, 2) - 2 * Q f (k + 2, 1) ≥ 0
     have hP0 := Q0_eq f k             -- "+", Q f (k+2,0)
     have hP0' := Q0_le f k
-    have hP2 : Q f (k + 2, 2) = f (k + 2, 2) := by simp only [Q]  -- "+", exact
+    have hP2 : Q f (k + 2, 2) = f (k + 2, 2) := by simp only [Q_modified]  -- "+", exact
     have hM := Q1_le f (k + 1)        -- "−", Q f (k+2,1): both upper bounds
     rcases hP0 with e | e | e <;> rw [e, hP2] <;>
     linarith [K1 0 (k+1), K1 1 (k+1), K1 2 k, K2 1 k, K2 2 k,
@@ -453,7 +455,7 @@ private theorem Q_preserves_K6 (f : ValueFn) (hf : InCone f) :
     intro a; have := hf.K6 a; linarith
   -- Q f (x+2,0) exact (3-way); Q f (x,2) exact; Q f (x+1,1) bounded above (both).
   have hP0 := Q0_eq f x                         -- Q f (x+2,0)
-  have hP2 : Q f (x, 2) = f (x, 2) := by simp only [Q]
+  have hP2 : Q f (x, 2) = f (x, 2) := by simp only [Q_modified]
   have hM := Q1_le f x                          -- Q f (x+1,1) ≤ f(x+1,1), ≤ f(x,2)
   rcases hP0 with e | e | e <;> rw [e, hP2] <;>
   linarith [K6 x, hM.1, hM.2]

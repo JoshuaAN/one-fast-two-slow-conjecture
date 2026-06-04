@@ -1,8 +1,8 @@
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic
 
-import Untitled.Defs
-import Untitled.Basic
+import OneFastTwoSlow.Defs
+import OneFastTwoSlow.Basic
 
 /-!
 # Closure of the cone 𝒦 under the event operator (Lemma 3)
